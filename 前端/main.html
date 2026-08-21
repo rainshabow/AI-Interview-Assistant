@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智面招聘 - 智能面试助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 头部样式 */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer; /* 点击头像可跳转到登录/认证页面 */
+        }
+
+        /* 主要内容区域 */
+        main {
+            padding: 2rem 0;
+            min-height: calc(100vh - 140px);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* 覆盖聊天输入框的全局 textarea 最小高度，确保聊天输入为单行起始高度 */
+        .chat-input textarea {
+            min-height: 28px;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #3ab3d4;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #e01a6f;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* 聊天界面样式 */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            /* 允许长词换行，避免溢出 */
+            word-break: break-word;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 消息容器：消息项使用 flex 布局，使消息气泡能按内容自适应高度 */
+        .message {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 0.75rem;
+            /* 单行/多行均可占据最大宽度的部分区域，避免整行撑满 */
+            max-width: 100%;
+        }
+
+        /* 人类消息靠右显示，AI 消息靠左 */
+        .message.human {
+            align-items: flex-end;
+        }
+        .message.ai {
+            align-items: flex-start;
+        }
+
+        /* 气泡样式：使用 inline-block 及 pre-wrap 保持换行，限制最大宽度以适应屏幕 */
+        .message-content {
+            display: inline-block;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+            /* 限制最大宽度（响应式）：桌面75%，手机90% */
+            max-width: 75%;
+            white-space: pre-wrap; /* 保留换行 */
+            word-break: break-word; /* 长词换行 */
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .message-content { max-width: 90%; }
+        }
+
+        .message.human .message-content {
+            background-color: var(--primary);
+            color: white;
+            border-top-right-radius: 6px;
+            border-top-left-radius: 18px;
+        }
+
+        .message.ai .message-content {
+            background-color: white;
+            border: 1px solid #eee;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 18px;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input input {
+            flex: 1;
+            margin-right: 0.5rem;
+        }
+
+        /* 加载状态 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .user-info {
+                margin-top: 1rem;
+            }
+            
+            .chat-container {
+                height: 400px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+
+        /* 登录页面样式 */
+        .auth-container {
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+
+        .auth-tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        /* 通知样式 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            color: white;
+            box-shadow: var(--box-shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        .notification.info {
+            background-color: var(--primary);
+        }
+
+        /* 分析报告样式 */
+        .report-content {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary);
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+    <!-- 引入 marked + DOMPurify，用于安全的 Markdown 渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+</head>
+<body>
+    <!-- 通知区域 -->
+    <div id="notification" class="notification"></div>
+
+    <!-- 头部 -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <span>智面招聘</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-page="dashboard">首页</a></li>
+                        <li><a href="#" class="nav-link" data-page="positions">岗位管理</a></li>
+                        <li><a href="#" class="nav-link" data-page="interview">面试</a></li>
+                        <li><a href="#" class="nav-link" data-page="history">历史记录</a></li>
+                    </ul>
+                </nav>
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar">U</div>
+                    <span id="username">未登录</span>
+                    <button id="logoutBtn" class="btn btn-outline" style="display: none;">退出</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container">
+        <!-- 登录/注册页面 -->
+        <div id="auth-page" class="page active">
+            <div class="auth-container card">
+                <div class="auth-tabs">
+                    <div class="auth-tab active" data-form="login">登录</div>
+                    <div class="auth-tab" data-form="register">注册</div>
+                </div>
+                
+                <div id="login-form" class="auth-form active">
+                    <div class="form-group">
+                        <label for="login-username">用户名</label>
+                        <input type="text" id="login-username" placeholder="请输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <input type="password" id="login-password" placeholder="请输入密码">
+                    </div>
+                    <button id="login-btn" class="btn btn-block">登录</button>
+                </div>
+                
+                <div id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="register-username">用户名</label>
+                        <input type="text" id="register-username" placeholder="3-50个字符">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">邮箱</label>
+                        <input type="email" id="register-email" placeholder="有效的邮箱地址">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">密码</label>
+                        <input type="password" id="register-password" placeholder="最少6位">
+                    </div>
+                    <button id="register-btn" class="btn btn-block">注册</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 仪表盘页面 -->
+        <div id="dashboard-page" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">欢迎使用智面招聘</h2>
+                </div>
+                <p>智面招聘是一个基于AI的智能面试平台，可以帮助您进行高效的岗位面试和人才评估。</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+                    <div class="card">
+                        <h3><i class="fas fa-briefcase"></i> 岗位管理</h3>
+                        <p>创建和管理面试岗位，设置岗位描述和要求。</p>
+                        <button class="btn btn-outline" data-page="positions">管理岗位</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-comments"></i> 开始面试</h3>
+                        <p>选择岗位并开始新的面试会话。</p>
+                        <button class="btn btn-outline" data-page="interview">开始面试</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-history"></i> 历史记录</h3>
+                        <p>查看以往的面试记录和分析报告。</p>
+                        <button class="btn btn-outline" data-page="history">查看历史</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 岗位管理页面 -->
+        <div id="positions-page" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">岗位管理</h2>
+                    <button id="create-position-btn" class="btn">创建新岗位</button>
+                </div>
+                
+                <div id="position-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="position-title">岗位名称</label>
+                        <input type="text" id="position-title" placeholder="请输入岗位名称（最多100字符）">
+                    </div>
+                    <div class="form-group">
+                        <label for="position-description">岗位描述 (JD)</label>
+                        <textarea id="position-description" placeholder="请输入岗位描述"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button id="save-position-btn" class="btn btn-success">保存岗位</button>
+                        <button id="cancel-position-btn" class="btn btn-outline">取消</button>
+                    </div>
+                </div>
+                
+                <div id="positions-list">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>岗位名称</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positions-table-body">
+                            <!-- 岗位数据将通过JS动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 岗位详情（默认隐藏） -->
+                <div id="position-detail" class="card" style="display: none; margin-top: 1rem;">
+                    <div class="card-header">
+                        <h3 id="position-detail-title" class="card-title">岗位名称</h3>
+                    </div>
+                    <div style="margin-bottom: 0.5rem; color: var(--gray);">
+                        <span>创建时间: </span><span id="position-detail-date"></span>
+                        <span style="margin-left:12px">创建者: </span><span id="position-detail-creator"></span>
+                    </div>
+                    <div id="position-detail-desc" style="white-space: pre-wrap; margin-top: 0.5rem;">
+                        <!-- 岗位详细说明（HTML或纯文本） -->
+                    </div>
+                    <div style="margin-top: 1rem; display:flex; gap:8px;">
+                        <button id="position-detail-back-btn" class="btn btn-outline">返回岗位列表</button>
+                        <button id="position-detail-delete-btn" class="btn btn-danger">删除岗位</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 面试页面 -->
+        <div id="interview-page" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">面试会话</h2>
+                </div>
+                
+                <div id="interview-setup">
+                    <div class="form-group">
+                        <label for="select-position">选择岗位</label>
+                        <select id="select-position">
+                            <option value="">请选择岗位</option>
+                            <!-- 岗位选项将通过JS动态加载 -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resume-file">上传简历（支持：.pdf .docx .doc .txt .md）</label>
+                        <input type="file" id="resume-file" accept=".pdf,.docx,.doc,.txt,.md">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resume-text">或粘贴简历文本（可选）</label>
+                        <textarea id="resume-text" placeholder="请输入简历内容，或留空使用默认简历"></textarea>
+                    </div>
+                    
+                    <button id="start-interview-btn" class="btn btn-success">开始面试</button>
+                </div>
+                
+                <div id="interview-chat" style="display: none;">
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- 聊天消息将通过JS动态加载 -->
+                        </div>
+                        <div class="chat-input">
+                            <!-- 使用自适应高度的 textarea 替代单行 input -->
+                            <textarea id="message-input" rows="1" placeholder="输入你的回答" style="resize:none;overflow:hidden;"></textarea>
+                            <button id="send-message-btn" class="btn">发送</button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; display: flex; gap: 10px;">
+                        <button id="end-interview-btn" class="btn btn-success">暂离面试</button>
+                        <button id="finish-interview-btn" class="btn btn-danger">结束面试</button>
+                        <button id="analyze-interview-btn" class="btn btn-outline">生成分析报告</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="analysis-report" class="card" style="display: none;">
+                <div class="card-header">
+                    <h2 class="card-title">面试分析报告</h2>
+                </div>
+                <div class="report-content" id="report-content">
+                    <!-- 报告内容将通过JS动态加载 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史记录页面 -->
+        <div id="history-page" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">面试历史记录</h2>
+                </div>
+                
+                <div id="sessions-list">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>会话ID</th>
+                                <th>岗位名称</th>
+                                <th>开始时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessions-table-body">
+                            <!-- 会话数据将通过JS动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 会话详情（默认隐藏） -->
+                <div id="session-detail" class="card" style="display: none; margin-top: 1rem;">
+                    <div class="card-header">
+                        <h3 id="session-detail-title" class="card-title">会话详情</h3>
+                        <div style="font-size:0.9rem;color:var(--gray)" id="session-detail-meta"></div>
+                    </div>
+                    <div class="chat-container" style="height: 360px; margin-bottom: 1rem;">
+                        <div class="chat-messages" id="session-detail-messages" style="background:#fff;padding:1rem;overflow:auto;">
+                            <!-- 历史对话消息 -->
+                        </div>
+                    </div>
+                    <div class="card" style="margin-bottom:1rem;">
+                        <div class="card-header">
+                            <h4 class="card-title">面试分析报告</h4>
+                        </div>
+                        <div class="report-content" id="session-detail-report" style="max-height: 300px; overflow:auto;">
+                            <!-- 历史分析报告（支持 Markdown 渲染） -->
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button id="session-detail-back-btn" class="btn btn-outline">返回历史记录</button>
+                        <button id="session-detail-regenerate-btn" class="btn">重新生成报告</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部 -->
+    <footer style="background-color: var(--dark); color: white; padding: 1.5rem 0; text-align: center;">
+        <div class="container">
+            <p>智面招聘 - 智能面试助手 &copy; 2025</p>
+        </div>
+    </footer>
+
+    <script>
+        // API配置（已指向本地，可在 .env 中配置后端端口）
+        const API_CONFIG = {
+            baseURL: 'http://localhost:8000',
+            timeout: 30000,
+            mock: false // 关闭 mock，使用后端服务
+        };
+
+        // 全局状态
+        const state = {
+            currentUser: null,
+            token: localStorage.getItem('access_token'),
+            positions: [],
+            currentSession: null,
+            sessions: []
+        };
+
+        // DOM元素
+        const elements = {
+            // 页面
+            authPage: document.getElementById('auth-page'),
+            dashboardPage: document.getElementById('dashboard-page'),
+            positionsPage: document.getElementById('positions-page'),
+            interviewPage: document.getElementById('interview-page'),
+            historyPage: document.getElementById('history-page'),
+            
+            // 用户界面
+            userAvatar: document.getElementById('userAvatar'),
+            username: document.getElementById('username'),
+            logoutBtn: document.getElementById('logoutBtn'),
+            
+            // 认证
+            loginForm: document.getElementById('login-form'),
+            registerForm: document.getElementById('register-form'),
+            authTabs: document.querySelectorAll('.auth-tab'),
+            authForms: document.querySelectorAll('.auth-form'),
+            loginBtn: document.getElementById('login-btn'),
+            registerBtn: document.getElementById('register-btn'),
+            loginUsername: document.getElementById('login-username'),
+            loginPassword: document.getElementById('login-password'),
+            registerUsername: document.getElementById('register-username'),
+            registerEmail: document.getElementById('register-email'),
+            registerPassword: document.getElementById('register-password'),
+            
+            // 岗位管理
+            createPositionBtn: document.getElementById('create-position-btn'),
+            positionForm: document.getElementById('position-form'),
+            positionTitle: document.getElementById('position-title'),
+            positionDescription: document.getElementById('position-description'),
+            savePositionBtn: document.getElementById('save-position-btn'),
+            cancelPositionBtn: document.getElementById('cancel-position-btn'),
+            positionsTableBody: document.getElementById('positions-table-body'),
+            // 岗位详情元素
+            positionsList: document.getElementById('positions-list'),
+            positionDetailCard: document.getElementById('position-detail'),
+            positionDetailTitle: document.getElementById('position-detail-title'),
+            positionDetailDate: document.getElementById('position-detail-date'),
+            positionDetailDesc: document.getElementById('position-detail-desc'),
+            positionDetailBackBtn: document.getElementById('position-detail-back-btn'),
+            positionDetailDeleteBtn: document.getElementById('position-detail-delete-btn'),
+            positionDetailCreator: document.getElementById('position-detail-creator'),
+            
+            // 面试
+            selectPosition: document.getElementById('select-position'),
+            resumeFile: document.getElementById('resume-file'),
+            resumeText: document.getElementById('resume-text'),
+            startInterviewBtn: document.getElementById('start-interview-btn'),
+            interviewSetup: document.getElementById('interview-setup'),
+            interviewChat: document.getElementById('interview-chat'),
+            chatMessages: document.getElementById('chat-messages'),
+            messageInput: document.getElementById('message-input'),
+            sendMessageBtn: document.getElementById('send-message-btn'),
+            endInterviewBtn: document.getElementById('end-interview-btn'),
+            finishInterviewBtn: document.getElementById('finish-interview-btn'),
+            analyzeInterviewBtn: document.getElementById('analyze-interview-btn'),
+            
+            // 分析报告
+            analysisReport: document.getElementById('analysis-report'),
+            reportContent: document.getElementById('report-content'),
+            
+            // 历史记录
+            sessionsTableBody: document.getElementById('sessions-table-body'),
+            // 会话详情元素（历史）
+            sessionDetailCard: document.getElementById('session-detail'),
+            sessionDetailTitle: document.getElementById('session-detail-title'),
+            sessionDetailMeta: document.getElementById('session-detail-meta'),
+            sessionDetailMessages: document.getElementById('session-detail-messages'),
+            sessionDetailReport: document.getElementById('session-detail-report'),
+            sessionDetailBackBtn: document.getElementById('session-detail-back-btn'),
+            sessionDetailRegenerateBtn: document.getElementById('session-detail-regenerate-btn'),
+            
+            // 导航
+            navLinks: document.querySelectorAll('.nav-link'),
+            
+            // 通知
+            notification: document.getElementById('notification')
+        };
+
+        // 工具函数
+        const utils = {
+            // 显示通知
+            showNotification(message, type = 'info') {
+                const notification = elements.notification;
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            },
+            
+            // 格式化日期
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleString('zh-CN');
+            },
+            
+            // 获取API请求头
+            getHeaders(contentType = 'application/json') {
+                const headers = {
+                    'Content-Type': contentType
+                };
+                
+                if (state.token) {
+                    headers['Authorization'] = `Bearer ${state.token}`;
+                }
+                
+                return headers;
+            },
+            
+            // 处理API响应
+            async handleResponse(response) {
+                // 204 No Content -> 返回 null，避免调用 response.json() 导致报错
+                if (response.status === 204) return null;
+
+                // 非2xx：尝试解析错误体（优先 JSON）
+                if (!response.ok) {
+                    let errorBody = null;
+                    try {
+                        const ct = response.headers.get('content-type') || '';
+                        if (ct.includes('application/json')) {
+                            errorBody = await response.json();
+                        } else {
+                            const txt = await response.text();
+                            try { errorBody = JSON.parse(txt); } catch { errorBody = { detail: txt || '请求失败' }; }
+                        }
+                    } catch (e) {
+                        errorBody = { detail: '请求失败' };
+                    }
+                    throw new Error(errorBody?.detail || `HTTP错误: ${response.status}`);
+                }
+
+                // 2xx 且有返回内容：按 content-type 解析 JSON 或文本
+                try {
+                    const ct = response.headers.get('content-type') || '';
+                    if (ct.includes('application/json')) {
+                        return await response.json();
+                    } else {
+                        const txt = await response.text();
+                        try { return JSON.parse(txt); } catch { return txt; }
+                    }
+                } catch (e) {
+                    // 解析异常则返回 null
+                    return null;
+                }
+            },
+            
+            // 生成随机颜色
+            getRandomColor() {
+                const colors = ['#4cc9f0', '#7209b7', '#f72585', '#4361ee', '#3a0ca3'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            },
+
+            // 安全地转义 HTML（防止 XSS）
+            escapeHtml(str = '') {
+                return String(str).replace(/[&<>"']/g, (s) => {
+                    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[s];
+                });
+            },
+
+            // 简单 Markdown -> HTML 渲染（使用 marked + DOMPurify，安全且兼容表格/代码块等）
+            markdownToHtml(md = '') {
+                const text = String(md || '');
+
+                if (typeof marked !== 'undefined') {
+                    // 标记解析选项：启用 GFM、保留换行、不生成 header id（避免与页面 id 冲突）
+                    marked.setOptions({
+                        gfm: true,
+                        breaks: true,
+                        headerIds: false,
+                        mangle: false
+                    });
+
+                    try {
+                        const rawHtml = marked.parse(text);
+                        // 使用 DOMPurify 清理并返回安全 HTML（若未加载则直接返回 rawHtml）
+                        if (typeof DOMPurify !== 'undefined') {
+                            return DOMPurify.sanitize(rawHtml);
+                        }
+                        return rawHtml;
+                    } catch (e) {
+                        console.error('marked 解析失败:', e);
+                        return this.escapeHtml(text).replace(/\n/g, '<br/>');
+                    }
+                }
+
+                // fallback：简单转义并保留换行
+                return '<p>' + this.escapeHtml(text).replace(/\n/g, '<br/>') + '</p>';
+            }
+        };
+
+        // API函数（根据接口文档调整：实现流式 chat / analyze）
+        const api = (function createApi() {
+            const MOCK = !!API_CONFIG.mock;
+            const id = () => 'id-' + Math.random().toString(36).slice(2, 10);
+            const nowISO = () => new Date().toISOString();
+            const load = (key, def) => {
+                try { return JSON.parse(localStorage.getItem(key)) || def; } catch { return def; }
+            };
+            const save = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+            const ensureMockData = () => {
+                if (load('mock_ready', false)) return;
+                const users = [{ username: 'tester', password: '123456', email: 'tester@example.com' }];
+                const positions = [{
+                    position_id: id(),
+                    title: '前端开发工程师',
+                    jd_text: '熟悉HTML/CSS/JS，能独立完成项目。',
+                    created_at: nowISO()
+                }];
+                save('mock_users', users);
+                save('mock_positions', positions);
+                save('mock_sessions', []);
+                save('mock_ready', true);
+            };
+            const makeToken = (username, ttlMs = 3600 * 1000) => {
+                const payload = { username, exp: Math.floor((Date.now() + ttlMs) / 1000) };
+                const b = (v) => btoa(JSON.stringify(v));
+                return `${b({alg: 'none'})}.${b(payload)}.sig`;
+            };
+            if (MOCK) ensureMockData();
+
+            // 远程调用（按接口文档实现流式处理）
+            const remote = {
+                register: async (userData) => {
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/auth/register`, {
+                        method: 'POST',
+                        headers: utils.getHeaders(),
+                        body: JSON.stringify(userData)
+                    });
+                    return utils.handleResponse(res);
+                },
+                 // 删除会话
+                 deleteSession: async (sessionId) => {
+                     const res = await fetch(`${API_CONFIG.baseURL}/api/interview/sessions/${sessionId}`, {
+                         method: 'DELETE',
+                         headers: utils.getHeaders()
+                     });
+                     return utils.handleResponse(res);
+                 },
+                // 结束会话并保存报告（不删除会话）
+                endSession: async (sessionId) => {
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/interview/sessions/${sessionId}/end`, {
+                        method: 'POST',
+                        headers: utils.getHeaders()
+                    });
+                    return utils.handleResponse(res);
+                },
+                login: async (credentials) => {
+                    const formData = new URLSearchParams();
+                    formData.append('username', credentials.username);
+                    formData.append('password', credentials.password);
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/auth/token`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    });
+                    return utils.handleResponse(res);
+                },
+                getCurrentUser: async () => {
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/auth/me`, { headers: utils.getHeaders() });
+                    return utils.handleResponse(res);
+                },
+                createPosition: async (positionData) => {
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/positions/`, {
+                        method: 'POST',
+                        headers: utils.getHeaders(),
+                        body: JSON.stringify(positionData)
+                    });
+                    return utils.handleResponse(res);
+                },
+                getPositions: async () => {
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/positions/`, { headers: utils.getHeaders() });
+                    return utils.handleResponse(res);
+                },
+                getPosition: async (positionId) => {
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/positions/${positionId}`, { headers: utils.getHeaders() });
+                    return utils.handleResponse(res);
+                },
+                startInterview: async (sessionData) => {
+                    // 使用 multipart/form-data 提交（支持文件或大段文本）
+                    const form = new FormData();
+                    if (sessionData.position_id != null) form.append('position_id', sessionData.position_id);
+                    if (sessionData.cv_text != null) form.append('cv_text', sessionData.cv_text);
+                    // 如果传入了文件，直接附带原文件（后端将接收原始文件）
+                    if (sessionData.file) {
+                        form.append('cv_file', sessionData.file, sessionData.file.name || 'resume');
+                    }
+
+                    // 移除 Content-Type，让浏览器设置 boundary
+                    const headers = utils.getHeaders();
+                    delete headers['Content-Type'];
+
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/interview/start`, {
+                        method: 'POST',
+                        headers,
+                        body: form
+                    });
+                    return utils.handleResponse(res);
+                },
+
+                deletePosition: async (positionId) => {
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/positions/${positionId}`, {
+                        method: 'DELETE',
+                        headers: utils.getHeaders()
+                    });
+                    return utils.handleResponse(res);
+                },
+
+                // 实现流式 chat（与文档一致的签名：onChunk/onComplete/onError）
+                chat: async (sessionId, message, onChunk, onComplete, onError) => {
+                    const token = state.token;
+                    try {
+                        const res = await fetch(`${API_CONFIG.baseURL}/api/interview/chat`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': token ? `Bearer ${token}` : '',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ session_id: sessionId, message })
+                        });
+
+                        if (!res.ok) {
+                            const err = await res.json().catch(() => ({ detail: '请求失败' }));
+                            throw new Error(err.detail || `HTTP ${res.status}`);
+                        }
+
+                        const reader = res.body.getReader();
+                        const decoder = new TextDecoder();
+                        let buffer = '';
+
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            buffer += decoder.decode(value, { stream: true });
+                            const lines = buffer.split('\n');
+                            buffer = lines.pop(); // 保留可能未完整的一行
+                            for (const line of lines) {
+                                if (line.startsWith('data: ')) {
+                                    try {
+                                        const data = JSON.parse(line.slice(6));
+                                        if (data.chunk) {
+                                            onChunk(data.chunk);
+                                        } else if (data.done) {
+                                            onComplete();
+                                            return;
+                                        } else if (data.error) {
+                                            onError(data.error);
+                                            return;
+                                        }
+                                    } catch (e) {
+                                        console.error('解析SSE数据失败:', e);
+                                    }
+                                }
+                            }
+                        }
+
+                        // 处理剩余缓冲区（若包含完整 data 行）
+                        if (buffer.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(buffer.slice(6));
+                                if (data.chunk) onChunk(data.chunk);
+                                if (data.done) { onComplete(); return; }
+                                if (data.error) { onError(data.error); return; }
+                            } catch (e) { /* 忽略 */ }
+                        }
+                        onComplete();
+                    } catch (err) {
+                        onError(err.message || String(err));
+                    }
+                },
+
+                // 实现流式 analyze（累积并返回片段）
+                analyzeInterview: async (sessionId, onChunk, onComplete, onError) => {
+                    const token = state.token;
+                    try {
+                        const res = await fetch(`${API_CONFIG.baseURL}/api/interview/analyze`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': token ? `Bearer ${token}` : '',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ session_id: sessionId })
+                        });
+
+                        if (!res.ok) {
+                            const err = await res.json().catch(() => ({ detail: '请求失败' }));
+                            throw new Error(err.detail || `HTTP ${res.status}`);
+                        }
+
+                        const reader = res.body.getReader();
+                        const decoder = new TextDecoder();
+                        let buffer = '';
+                        let fullReport = '';
+
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            buffer += decoder.decode(value, { stream: true });
+                            const lines = buffer.split('\n');
+                            buffer = lines.pop();
+                            for (const line of lines) {
+                                if (line.startsWith('data: ')) {
+                                    try {
+                                        const data = JSON.parse(line.slice(6));
+                                        if (data.chunk) {
+                                            fullReport += data.chunk;
+                                            onChunk(fullReport);
+                                        } else if (data.done) {
+                                            onComplete();
+                                            return;
+                                        } else if (data.error) {
+                                            onError(data.error);
+                                            return;
+                                        }
+                                    } catch (e) {
+                                        console.error('解析SSE数据失败:', e);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (buffer.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(buffer.slice(6));
+                                if (data.chunk) {
+                                    fullReport += data.chunk;
+                                    onChunk(fullReport);
+                                }
+                                if (data.done) { onComplete(); return; }
+                                if (data.error) { onError(data.error); return; }
+                            } catch (e) { /* 忽略 */ }
+                        }
+
+                        onComplete();
+                    } catch (err) {
+                        onError(err.message || String(err));
+                    }
+                },
+
+                getSessions: async () => {
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/interview/sessions`, { headers: utils.getHeaders() });
+                    return utils.handleResponse(res);
+                },
+                getSessionMessages: async (sessionId) => {
+                    const res = await fetch(`${API_CONFIG.baseURL}/api/interview/sessions/${sessionId}/messages`, { headers: utils.getHeaders() });
+                    return utils.handleResponse(res);
+                }
+            };
+
+            // Mock 实现（保持不变）
+            const mock = {
+                register: async ({ username, email, password }) => {
+                    const users = load('mock_users', []);
+                    if (users.find(u => u.username === username)) throw new Error('用户名已存在（mock）');
+                    users.push({ username, email, password });
+                    save('mock_users', users);
+                    return { message: '注册成功（mock）' };
+                },
+                 // mock 删除会话
+                 deleteSession: async (sessionId) => {
+                     let sessions = load('mock_sessions', []);
+                     const beforeLen = sessions.length;
+                     sessions = sessions.filter(s => s.session_id !== sessionId);
+                     save('mock_sessions', sessions);
+                     if (sessions.length === beforeLen) throw new Error('会话不存在（mock）');
+                     // 删除对应的聊天记录
+                     localStorage.removeItem(`mock_messages_${sessionId}`);
+                     return { message: '删除成功（mock）' };
+                 },
+                login: async ({ username, password }) => {
+                    const users = load('mock_users', []);
+                    const u = users.find(x => x.username === username && x.password === password);
+                    if (!u) throw new Error('用户名或密码错误（mock）');
+                    return { access_token: makeToken(username) };
+                },
+                getCurrentUser: async () => {
+                    if (!state.token) throw new Error('未登录（mock）');
+                    try {
+                        const payload = JSON.parse(atob(state.token.split('.')[1]));
+                        const users = load('mock_users', []);
+                        const u = users.find(x => x.username === payload.username);
+                        if (!u) throw new Error('用户不存在（mock）');
+                        return { username: u.username, email: u.email || '' };
+                    } catch {
+                        throw new Error('token 无效（mock）');
+                    }
+                },
+                createPosition: async (positionData) => {
+                    const positions = load('mock_positions', []);
+                    const p = { position_id: id(), title: positionData.title, jd_text: positionData.jd_text, created_at: nowISO() };
+                    positions.unshift(p);
+                    save('mock_positions', positions);
+                    return p;
+                },
+                getPositions: async () => load('mock_positions', []),
+                getPosition: async (positionId) => {
+                    const positions = load('mock_positions', []);
+                    const p = positions.find(x => x.position_id === positionId);
+                    if (!p) throw new Error('岗位不存在（mock）');
+                    return p;
+                },
+                startInterview: async ({ position_id, cv_text }) => {
+                    const sessions = load('mock_sessions', []);
+                    const s = { session_id: id(), position_id, cv_text: cv_text || '', cv_file_name: file ? (file.name || 'resume') : null, created_at: nowISO() };
+                    sessions.unshift(s);
+                    save('mock_sessions', sessions);
+                    save(`mock_messages_${s.session_id}`, []);
+                    return s;
+                },
+                chat: async (sessionId, message, onChunk, onComplete, onError) => {
+                    try {
+                        const replies = [
+                            '收到，你的回答很有逻辑。',
+                            '建议：增加具体项目数据支持你的观点。',
+                            '下面是一个更简洁的回答示例：'
+                        ];
+                        let idx = 0;
+                        const callNext = () => {
+                            if (idx < replies.length) {
+                                onChunk(replies[idx] + (idx === replies.length - 1 ? '\n示例回答：我是一个...' : ' '));
+                                idx++;
+                                setTimeout(callNext, 400);
+                            } else {
+                                onComplete();
+                            }
+                        };
+                        setTimeout(callNext, 300);
+                    } catch (e) {
+                        onError(e.message || String(e));
+                    }
+                },
+                analyzeInterview: async (sessionId, onChunk, onComplete, onError) => {
+                    try {
+                        const parts = [
+                            '评分维度：沟通、技术、逻辑。',
+                            '优点：表达清晰、回应迅速。',
+                            '改进建议：补充量化成果，回应要更简洁。',
+                            '总体建议：推荐进入下一轮技术面试。'
+                        ];
+                        let i = 0;
+                        const timer = setInterval(() => {
+                            i++;
+                            onChunk(parts.slice(0, i).join('\n\n'));
+                            if (i >= parts.length) {
+                                clearInterval(timer);
+                                onComplete();
+                            }
+                        }, 500);
+                    } catch (e) {
+                        onError(e.message || String(e));
+                    }
+                },
+                // mock 结束会话并保存报告
+                endSession: async (sessionId) => {
+                    const sessions = load('mock_sessions', []);
+                    const s = sessions.find(x => x.session_id === sessionId);
+                    if (!s) throw new Error('会话不存在（mock）');
+                    s.is_ended = true;
+                    s.report = '这是 mock 的分析报告。';
+                    save('mock_sessions', sessions);
+                    return s;
+                },
+                getSessions: async () => load('mock_sessions', []),
+                getSessionMessages: async (sessionId) => load(`mock_messages_${sessionId}`, [])
+            };
+
+            return {
+                register: async (data) => MOCK ? mock.register(data) : remote.register(data),
+                login: async (cred) => MOCK ? mock.login(cred) : remote.login(cred),
+                getCurrentUser: async () => MOCK ? mock.getCurrentUser() : remote.getCurrentUser(),
+                createPosition: async (data) => MOCK ? mock.createPosition(data) : remote.createPosition(data),
+                deletePosition: async (positionId) => MOCK ? mock.deletePosition(positionId) : remote.deletePosition(positionId),
+                getPositions: async () => MOCK ? mock.getPositions() : remote.getPositions(),
+                getPosition: async (id) => MOCK ? mock.getPosition(id) : remote.getPosition(id),
+                startInterview: async (data) => MOCK ? mock.startInterview(data) : remote.startInterview(data),
+                deleteSession: async (id) => MOCK ? mock.deleteSession(id) : remote.deleteSession(id),
+                endSession: async (id) => MOCK ? mock.endSession(id) : remote.endSession(id),
+                chat: async (sessionId, message, onChunk, onComplete, onError) => MOCK ? mock.chat(sessionId, message, onChunk, onComplete, onError) : remote.chat(sessionId, message, onChunk, onComplete, onError),
+                analyzeInterview: async (sessionId, onChunk, onComplete, onError) => MOCK ? mock.analyzeInterview(sessionId, onChunk, onComplete, onError) : remote.analyzeInterview(sessionId, onChunk, onComplete, onError),
+                getSessions: async () => MOCK ? mock.getSessions() : remote.getSessions(),
+                getSessionMessages: async (sessionId) => MOCK ? mock.getSessionMessages(sessionId) : remote.getSessionMessages(sessionId)
+            };
+        })();
+        // 认证管理
+        const authManager = {
+            // 保存Token
+            saveToken(token) {
+                localStorage.setItem('access_token', token);
+                state.token = token;
+            },
+            
+            // 移除Token
+            removeToken() {
+                localStorage.removeItem('access_token');
+                state.token = null;
+                state.currentUser = null;
+            },
+            
+            // 检查Token是否有效
+            isTokenValid() {
+                if (!state.token) return false;
+
+                // 支持两种 token：JWT（含 . 分隔）或后端生成的随机字符串（opaque token）。
+                try {
+                    if (state.token.includes('.')) {
+                        const payload = JSON.parse(atob(state.token.split('.')[1]));
+                        return payload.exp * 1000 > Date.now();
+                    }
+                    // 对于非 JWT（后端返回的随机 token），只要存在即视为有效（本地测试模式）
+                    return true;
+                } catch {
+                    return false;
+                }
+            },
+            
+            // 初始化认证状态
+            async initAuth() {
+                if (this.isTokenValid()) {
+                    try {
+                        state.currentUser = await api.getCurrentUser();
+                        this.updateUIForLoggedInUser();
+                        return true;
+                    } catch (error) {
+                        this.removeToken();
+                        this.updateUIForLoggedOutUser();
+                        return false;
+                    }
+                } else {
+                    this.removeToken();
+                    this.updateUIForLoggedOutUser();
+                    return false;
+                }
+            },
+            
+            // 更新登录用户UI
+            updateUIForLoggedInUser() {
+                elements.authPage.classList.remove('active');
+                elements.dashboardPage.classList.add('active');
+                
+                elements.userAvatar.textContent = state.currentUser.username.charAt(0).toUpperCase();
+                elements.userAvatar.style.backgroundColor = utils.getRandomColor();
+                elements.username.textContent = state.currentUser.username;
+                elements.logoutBtn.style.display = 'block';
+                
+                // 加载用户数据
+                positionManager.loadPositions();
+                sessionManager.loadSessions();
+            },
+            
+            // 更新未登录用户UI
+            updateUIForLoggedOutUser() {
+                // 隐藏所有页面并显示登录页（保持与 navigation 一致）
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                elements.authPage.classList.add('active');
+                
+                // 清理导航高亮
+                elements.navLinks.forEach(l => l.classList.remove('active'));
+                
+                // 更新用户展示
+                elements.userAvatar.textContent = 'U';
+                elements.userAvatar.style.backgroundColor = '#6c757d';
+                elements.username.textContent = '未登录';
+                elements.logoutBtn.style.display = 'none';
+            },
+            
+            // 处理登录
+            async handleLogin() {
+                const username = elements.loginUsername.value.trim();
+                const password = elements.loginPassword.value;
+                
+                if (!username || !password) {
+                    utils.showNotification('请输入用户名和密码', 'error');
+                    return;
+                }
+                
+                elements.loginBtn.innerHTML = '<div class="loading"></div> 登录中...';
+                elements.loginBtn.disabled = true;
+                
+                try {
+                    const result = await api.login({ username, password });
+                    this.saveToken(result.access_token);
+                    
+                    await this.initAuth();
+                    utils.showNotification('登录成功', 'success');
+                } catch (error) {
+                    utils.showNotification(error.message, 'error');
+                } finally {
+                    elements.loginBtn.innerHTML = '登录';
+                    elements.loginBtn.disabled = false;
+                }
+            },
+            
+            // 处理注册
+            async handleRegister() {
+                const username = elements.registerUsername.value.trim();
+                const email = elements.registerEmail.value.trim();
+                const password = elements.registerPassword.value;
+                
+                if (!username || !email || !password) {
+                    utils.showNotification('请填写所有字段', 'error');
+                    return;
+                }
+                
+                if (username.length < 3 || username.length > 50) {
+                    utils.showNotification('用户名长度应为3-50个字符', 'error');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    utils.showNotification('密码长度至少6位', 'error');
+                    return;
+                }
+                
+                elements.registerBtn.innerHTML = '<div class="loading"></div> 注册中...';
+                elements.registerBtn.disabled = true;
+                
+                try {
+                    await api.register({ username, email, password });
+                    utils.showNotification('注册成功，请登录', 'success');
+                    
+                    // 切换到登录表单
+                    document.querySelector('.auth-tab[data-form="login"]').click();
+                    
+                    // 清空注册表单
+                    elements.registerUsername.value = '';
+                    elements.registerEmail.value = '';
+                    elements.registerPassword.value = '';
+                } catch (error) {
+                    utils.showNotification(error.message, 'error');
+                } finally {
+                    elements.registerBtn.innerHTML = '注册';
+                    elements.registerBtn.disabled = false;
+                }
+            },
+            
+            // 处理退出
+            handleLogout() {
+                // 清除 token 与用户信息
+                this.removeToken();
+                state.currentUser = null;
+                
+                // 使用导航统一切换到登录页（会清理页面显示与导航状态）
+                if (typeof navigation !== 'undefined') {
+                    navigation.switchToPage('auth');
+                    this.updateUIForLoggedOutUser();
+                } else {
+                    // fallback：直接更新 UI
+                    this.updateUIForLoggedOutUser();
+                }
+                
+                utils.showNotification('已退出登录', 'info');
+            }
+        };
+
+        // 岗位管理
+        const positionManager = {
+            // 加载岗位列表
+            async loadPositions() {
+                try {
+                    state.positions = await api.getPositions();
+                    this.renderPositions();
+                    this.renderPositionOptions();
+                } catch (error) {
+                    utils.showNotification('加载岗位失败: ' + error.message, 'error');
+                }
+            },
+            
+            // 渲染岗位列表
+            renderPositions() {
+                const tbody = elements.positionsTableBody;
+                tbody.innerHTML = '';
+                
+                if (state.positions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">暂无岗位</td></tr>';
+                    return;
+                }
+                
+                state.positions.forEach(position => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${position.title}</td>
+                        <td>${utils.formatDate(position.created_at)}</td>
+                        <td>
+                            <button class="btn btn-outline" onclick="positionManager.viewPosition('${position.position_id}')">查看</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+            
+            // (删除功能已移除，保留查看/创建/列表功能)
+            
+            // 渲染岗位选项（用于面试选择）
+            renderPositionOptions() {
+                const select = elements.selectPosition;
+                select.innerHTML = '<option value="">请选择岗位</option>';
+                
+                state.positions.forEach(position => {
+                    const option = document.createElement('option');
+                    option.value = position.position_id;
+                    option.textContent = position.title;
+                    select.appendChild(option);
+                });
+            },
+            
+            // 显示创建岗位表单
+            showCreateForm() {
+                elements.positionForm.style.display = 'block';
+                elements.positionTitle.value = '';
+                elements.positionDescription.value = '';
+            },
+            
+            // 隐藏创建岗位表单
+            hideCreateForm() {
+                elements.positionForm.style.display = 'none';
+            },
+            
+            // 创建新岗位
+            async createPosition() {
+                const title = elements.positionTitle.value.trim();
+                const description = elements.positionDescription.value.trim();
+                
+                if (!title || !description) {
+                    utils.showNotification('请填写岗位名称和描述', 'error');
+                    return;
+                }
+                
+                if (title.length > 100) {
+                    utils.showNotification('岗位名称不能超过100个字符', 'error');
+                    return;
+                }
+                
+                elements.savePositionBtn.innerHTML = '<div class="loading"></div> 创建中...';
+                elements.savePositionBtn.disabled = true;
+                
+                try {
+                    await api.createPosition({
+                        title: title,
+                        description: description
+                    });
+                    
+                    utils.showNotification('岗位创建成功', 'success');
+                    this.hideCreateForm();
+                    await this.loadPositions();
+                } catch (error) {
+                    utils.showNotification('创建岗位失败: ' + error.message, 'error');
+                } finally {
+                    elements.savePositionBtn.innerHTML = '保存岗位';
+                    elements.savePositionBtn.disabled = false;
+                }
+            },
+            
+            // 查看岗位详情（从后端获取并显示详情卡片）
+            async viewPosition(positionId) {
+                try {
+                    // 切换到岗位管理页面并隐藏列表显示详情
+                    if (typeof navigation !== 'undefined') navigation.switchToPage('positions');
+                    
+                    const position = await api.getPosition(positionId);
+
+                    // 填充详情
+                    elements.positionDetailTitle.textContent = position.title || '未命名岗位';
+                    elements.positionDetailDate.textContent = position.created_at ? utils.formatDate(position.created_at) : '';
+                    // 详细说明保留换行与基本转义，若后端返回 HTML 需慎用
+                    elements.positionDetailDesc.textContent = position.jd_text || position.description || '';
+                    // 显示创建者名称（若后端返回 created_by_username）
+                    if (elements.positionDetailCreator) {
+                        elements.positionDetailCreator.textContent = position.created_by_username || position.created_by || '';
+                    }
+
+                    // 隐藏列表/表单，显示详情卡
+                    elements.positionsList.style.display = 'none';
+                    elements.positionForm.style.display = 'none';
+                    // 保存 position id 到详情卡 dataset，供删除等操作使用
+                    elements.positionDetailCard.dataset.positionId = position.id || position.position_id || '';
+                    elements.positionDetailCard.style.display = 'block';
+                } catch (error) {
+                    utils.showNotification('获取岗位详情失败: ' + error.message, 'error');
+                }
+            },
+
+            // 删除岗位（仅创建者可删除）
+            async deletePosition(positionId) {
+                if (!confirm('确认删除该岗位？此操作不可恢复。')) return;
+                try {
+                    await api.deletePosition(positionId);
+                    utils.showNotification('岗位已删除', 'success');
+                    // 返回列表并刷新
+                    this.backToList();
+                    await this.loadPositions();
+                } catch (error) {
+                    utils.showNotification('删除岗位失败: ' + (error.message || error), 'error');
+                }
+            },
+
+            // 返回岗位列表（隐藏详情，显示列表）
+            backToList() {
+                elements.positionDetailCard.style.display = 'none';
+                elements.positionsList.style.display = 'block';
+                elements.positionForm.style.display = 'none';
+            },
+        };
+
+        // 面试管理
+        const sessionManager = {
+            currentSession: null,
+            isInterviewActive: false,
+            
+            // 加载面试会话列表
+            async loadSessions() {
+                try {
+                    state.sessions = await api.getSessions();
+                    this.renderSessions();
+                } catch (error) {
+                    utils.showNotification('加载会话失败: ' + error.message, 'error');
+                }
+            },
+            
+            // 渲染会话列表
+            renderSessions() {
+                const tbody = elements.sessionsTableBody;
+                tbody.innerHTML = '';
+                
+                if (!state.sessions || state.sessions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">暂无面试记录</td></tr>';
+                    return;
+                }
+                
+                state.sessions.forEach(session => {
+                    const position = state.positions.find(p => p.position_id === session.position_id);
+                    const positionName = position ? position.title : '未知岗位';
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${session.session_id.substring(0, 8)}...</td>
+                        <td>${positionName}</td>
+                        <td>${utils.formatDate(session.created_at)}</td>
+                        <td>
+                            <button class="btn btn-outline" onclick="sessionManager.viewSession('${session.session_id}')">查看详情</button>
+                            <button class="btn btn-danger" style="margin-left:8px;" onclick="sessionManager.deleteSession('${session.session_id}')">删除</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+            
+            // 删除会话（确认后删除并刷新列表）
+            async deleteSession(sessionId) {
+                if (!confirm('确定要删除该会话及其所有聊天记录？此操作不可恢复。')) return;
+                try {
+                    await api.deleteSession(sessionId);
+                    utils.showNotification('删除会话成功', 'success');
+                    await this.loadSessions();
+                } catch (error) {
+                    utils.showNotification('删除会话失败: ' + error.message, 'error');
+                }
+            },
+            
+            // 开始面试（支持上传文件或粘贴文本）
+            async startInterview() {
+                const positionId = elements.selectPosition.value;
+                const resumeText = elements.resumeText.value.trim();
+                const resumeFile = elements.resumeFile && elements.resumeFile.files && elements.resumeFile.files[0] ? elements.resumeFile.files[0] : null;
+
+                if (!positionId) {
+                    utils.showNotification('请选择岗位', 'error');
+                    return;
+                }
+
+                elements.startInterviewBtn.innerHTML = '<div class="loading"></div> 启动中...';
+                elements.startInterviewBtn.disabled = true;
+
+                try {
+                    const session = await api.startInterview({
+                        position_id: positionId,
+                        cv_text: resumeText || undefined,
+                        file: resumeFile || undefined
+                    });
+
+                    // 保存当前会话
+                    this.currentSession = session;
+                    state.currentSession = session;
+                    this.isInterviewActive = true;
+
+                    elements.interviewSetup.style.display = 'none';
+                    elements.interviewChat.style.display = 'block';
+                    elements.analysisReport.style.display = 'none';
+
+                    // 清空并初始化聊天区
+                    elements.chatMessages.innerHTML = '';
+                    // 使用后端返回的 initial_message（兼容 initialMessage / data.initial_message 等）
+                    const initial = session.initial_message || session.initialMessage || (session.data && (session.data.initial_message || session.data.initialMessage));
+                    const fallback = '您好！我是AI面试官，很高兴为您面试。请简要介绍一下您自己。';
+                    const initialText = initial || fallback;
+                    // 尽量使用会话创建时间作为消息时间（若可用）
+                    const initialTs = session.created_at || session.createdAt || null;
+                    this.addMessage('ai', initialText, initialTs);
+
+                    utils.showNotification('面试已开始', 'success');
+                } catch (error) {
+                    utils.showNotification('开始面试失败: ' + error.message, 'error');
+                } finally {
+                    elements.startInterviewBtn.innerHTML = '开始面试';
+                    elements.startInterviewBtn.disabled = false;
+                }
+            },
+            
+            // 发送消息（用户 -> AI，支持流式渲染）
+            async sendMessage() {
+                const message = elements.messageInput.value.trim();
+                if (!message || !this.isInterviewActive || !this.currentSession) return;
+
+                // 添加用户消息
+                this.addMessage('human', message);
+                // 清空输入并重置高度到初始单行高度
+                elements.messageInput.value = '';
+                if (elements.messageInput && elements.messageInput.dataset && elements.messageInput.dataset.initialHeight) {
+                    elements.messageInput.style.height = elements.messageInput.dataset.initialHeight + 'px';
+                } else if (elements.messageInput) {
+                    elements.messageInput.style.height = '28px';
+                }
+
+                // 禁用输入
+                elements.messageInput.disabled = true;
+                elements.sendMessageBtn.disabled = true;
+                elements.sendMessageBtn.innerHTML = '<div class="loading"></div>';
+
+                try {
+                    // 占位 AI 消息元素，用于流式更新
+                    const aiEl = this.addMessage('ai', '');
+                    aiEl._raw = aiEl._raw || '';
+
+                    await api.chat(
+                        this.currentSession.session_id,
+                        message,
+                        (chunk) => {
+                            // 累积原始片段并渲染 Markdown
+                            aiEl._raw += chunk;
+                            const contentEl = aiEl.querySelector('.message-content');
+                            contentEl.innerHTML = utils.markdownToHtml(aiEl._raw);
+                            elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+                        },
+                        () => {
+                            elements.messageInput.disabled = false;
+                            elements.sendMessageBtn.disabled = false;
+                            elements.sendMessageBtn.innerHTML = '发送';
+                            // 重置输入框高度为初始高度
+                            if (elements.messageInput && elements.messageInput.dataset && elements.messageInput.dataset.initialHeight) {
+                                elements.messageInput.style.height = elements.messageInput.dataset.initialHeight + 'px';
+                            }
+                            elements.messageInput.focus();
+                        },
+                        (error) => {
+                            utils.showNotification('发送消息失败: ' + error, 'error');
+                            elements.messageInput.disabled = false;
+                            elements.sendMessageBtn.disabled = false;
+                            elements.sendMessageBtn.innerHTML = '发送';
+                            if (elements.messageInput && elements.messageInput.dataset && elements.messageInput.dataset.initialHeight) {
+                                elements.messageInput.style.height = elements.messageInput.dataset.initialHeight + 'px';
+                            }
+                        }
+                    );
+                } catch (error) {
+                    utils.showNotification('发送消息失败: ' + error.message, 'error');
+                    elements.messageInput.disabled = false;
+                    elements.sendMessageBtn.disabled = false;
+                    elements.sendMessageBtn.innerHTML = '发送';
+                    if (elements.messageInput && elements.messageInput.dataset && elements.messageInput.dataset.initialHeight) {
+                        elements.messageInput.style.height = elements.messageInput.dataset.initialHeight + 'px';
+                    }
+                }
+            },
+            
+            // 结束面试（本地切换状态；如需后端接口可在此处调用）
+            endInterview() {
+                this.isInterviewActive = false;
+                this.currentSession = null;
+                state.currentSession = null;
+                elements.interviewChat.style.display = 'none';
+                elements.interviewSetup.style.display = 'block';
+                elements.analysisReport.style.display = 'none';
+                utils.showNotification('面试记录已保存', 'info');
+            },
+
+            // 结束会话：调用后端保存分析报告并标记为结束（不删除会话）
+            async finishInterview() {
+                if (!this.currentSession || !this.currentSession.session_id) {
+                    utils.showNotification('没有有效的会话可结束', 'error');
+                    return;
+                }
+                if (!confirm('确定要结束面试并保存报告？会话将保存在历史记录中。')) return;
+                try {
+                    const updated = await api.endSession(this.currentSession.session_id);
+                    this.isInterviewActive = false;
+                    this.currentSession = null;
+                    state.currentSession = null;
+                    elements.interviewChat.style.display = 'none';
+                    elements.interviewSetup.style.display = 'block';
+                    elements.analysisReport.style.display = 'none';
+                    utils.showNotification('面试已结束并保存到历史', 'success');
+                    // 刷新会话列表（若在历史页可见）
+                    await this.loadSessions();
+                } catch (e) {
+                    throw e;
+                }
+            },
+            
+            // 生成当前会话的分析报告（流式，支持 Markdown）
+            async generateAnalysisReport(sessionId) {
+                // 优先使用传入 id，其次尝试当前会话或详情卡 dataset 中的 id
+                const sid = sessionId || this.currentSession?.session_id || elements.sessionDetailCard.dataset.sessionId;
+                if (!sid) {
+                    utils.showNotification('会话ID缺失，无法生成报告', 'error');
+                    return;
+                }
+
+                // 判断调用上下文：是否在详情页
+                const inDetail = elements.sessionDetailCard && elements.sessionDetailCard.style.display === 'block';
+                // 如果在面试页面（非详情），并且当前会话未结束，则阻止生成报告
+                // if (!inDetail) {
+                //     if (this.currentSession && !this.currentSession.is_ended) {
+                //         utils.showNotification('当前面试未结束，无法生成分析报告', 'info');
+                //         return;
+                //     }
+                // }
+                const targetReportEl = inDetail ? elements.sessionDetailReport : elements.reportContent;
+
+                // 按钮与显示逻辑：面试页使用 analyzeInterviewBtn，详情页使用 sessionDetailRegenerateBtn
+                const actionBtn = inDetail ? elements.sessionDetailRegenerateBtn : elements.analyzeInterviewBtn;
+                if (!inDetail) elements.analysisReport.style.display = 'block';
+
+                // 显示加载状态
+                actionBtn._origText = actionBtn._origText || actionBtn.textContent;
+                actionBtn.innerHTML = '<div class="loading"></div> 生成中...';
+                actionBtn.disabled = true;
+                targetReportEl.innerHTML = utils.markdownToHtml('正在生成分析报告...');
+
+                try {
+                    await api.analyzeInterview(
+                        sid,
+                        (chunk) => {
+                            targetReportEl.innerHTML = utils.markdownToHtml(chunk);
+                        },
+                        () => {
+                            actionBtn.innerHTML = actionBtn._origText;
+                            actionBtn.disabled = false;
+                            utils.showNotification('分析报告生成完成', 'success');
+                        },
+                        (err) => {
+                            actionBtn.innerHTML = actionBtn._origText;
+                            actionBtn.disabled = false;
+                            utils.showNotification('生成报告失败: ' + err, 'error');
+                        }
+                    );
+                } catch (e) {
+                    actionBtn.innerHTML = actionBtn._origText;
+                    actionBtn.disabled = false;
+                    utils.showNotification('生成报告失败: ' + (e.message || e), 'error');
+                }
+            },
+            
+            // 添加消息到聊天界面，返回创建的元素以便后续流式更新
+            // 新增可选 createdAt 参数：如果提供则显示原始时间（恢复历史消息时使用）
+            addMessage(role, content, createdAt) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${role}`;
+                const rendered = content ? utils.markdownToHtml(content) : '';
+                // 优先使用传入的 createdAt（后端返回的时间），否则使用当前本地时间（仅显示时间部分）
+                const timeText = createdAt ? utils.formatDate(createdAt) : new Date().toLocaleTimeString('zh-CN');
+                messageDiv.innerHTML = `
+                    <div class="message-content">${rendered}</div>
+                    <div class="message-time">${timeText}</div>
+                `;
+                elements.chatMessages.appendChild(messageDiv);
+                elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+                return messageDiv;
+            },
+            
+            // 查看会话详情（历史记录视图）：展示对话记录并根据 is_ended 决定按钮行为
+            async viewSession(sessionId) {
+                try {
+                    if (typeof navigation !== 'undefined') navigation.switchToPage('history');
+
+                    // 确保最新会话列表（navigation 切换时已刷新，但这里双重保障）
+                    if (!state.sessions || state.sessions.length === 0) {
+                        state.sessions = await api.getSessions();
+                    }
+
+                    const session = state.sessions.find(s => s.session_id === sessionId) || (await api.getSessions()).find(s => s.session_id === sessionId);
+                    if (!session) {
+                        utils.showNotification('会话不存在', 'error');
+                        return;
+                    }
+
+                    // 保存当前打开的会话id到详情卡，供按钮使用
+                    elements.sessionDetailCard.dataset.sessionId = sessionId;
+
+                    const position = state.positions.find(p => p.position_id === session.position_id);
+                    const positionName = position ? position.title : '未知岗位';
+                    elements.sessionDetailTitle.textContent = `${positionName} · ${session.session_id.substring(0,8)}...`;
+                    elements.sessionDetailMeta.textContent = `开始时间：${session.created_at ? utils.formatDate(session.created_at) : '未知'}`;
+
+                    // 显示详情卡，隐藏列表
+                    elements.sessionsTableBody.closest('#sessions-list').style.display = 'none';
+                    elements.sessionDetailCard.style.display = 'block';
+
+                    // 加载聊天记录
+                    elements.sessionDetailMessages.innerHTML = '<div style="color:var(--gray)">加载对话记录...</div>';
+                    try {
+                        const messages = await api.getSessionMessages(sessionId);
+                        elements.sessionDetailMessages.innerHTML = '';
+                        if (!messages || messages.length === 0) {
+                            elements.sessionDetailMessages.innerHTML = '<div style="color:var(--gray)">暂无聊天记录</div>';
+                        } else {
+                            messages.forEach(msg => {
+                                const div = document.createElement('div');
+                                div.className = 'message ' + (msg.role === 'human' ? 'human' : 'ai');
+                                const content = msg.content || msg.text || '';
+                                // 优先使用后端返回的 timestamp 字段，其次兼容 created_at / createdAt
+                                const ts = msg.timestamp || msg.created_at || msg.createdAt || null;
+                                div.innerHTML = `
+                                    <div class="message-content">${utils.markdownToHtml(content)}</div>
+                                    <div class="message-time">${ts ? utils.formatDate(ts) : ''}</div>
+                                `;
+                                elements.sessionDetailMessages.appendChild(div);
+                            });
+                            elements.sessionDetailMessages.scrollTop = elements.sessionDetailMessages.scrollHeight;
+                        }
+                    } catch (e) {
+                        elements.sessionDetailMessages.innerHTML = '<div style="color:var(--gray)">加载对话记录失败</div>';
+                    }
+
+                    // 根据后端新字段判断是否已结束：若未结束，不请求分析报告，按钮显示为“继续面试”
+                    const isEnded = !!session.is_ended;
+                    if (!isEnded) {
+                        // 未结束：不请求报告，按钮显示为“继续面试”，样式与“重新生成报告”保持一致（使用 .btn）
+                        elements.sessionDetailReport.innerHTML = utils.markdownToHtml('该面试尚未结束，无法生成分析报告。');
+                        elements.sessionDetailRegenerateBtn.textContent = '继续面试';
+                        elements.sessionDetailRegenerateBtn.classList.remove('btn-success');
+                        elements.sessionDetailRegenerateBtn.classList.add('btn');
+                    } else {
+                        // 已结束：按钮为“重新生成报告”，并流式加载历史报告
+                        elements.sessionDetailRegenerateBtn.textContent = '重新生成报告';
+                        elements.sessionDetailRegenerateBtn.classList.remove('btn-success');
+                        elements.sessionDetailRegenerateBtn.classList.add('btn');
+
+                        elements.sessionDetailReport.innerHTML = utils.markdownToHtml('正在加载分析报告...');
+                        api.analyzeInterview(sessionId,
+                            (chunk) => {
+                                elements.sessionDetailReport.innerHTML = utils.markdownToHtml(chunk);
+                            },
+                            () => { utils.showNotification('分析报告加载完成', 'success'); },
+                            (err) => { utils.showNotification('分析报告加载失败: ' + err, 'error'); }
+                        ).catch(() => {});
+                    }
+
+                } catch (error) {
+                    utils.showNotification('打开会话失败: ' + error.message, 'error');
+                }
+            },
+            
+            // 返回历史列表
+            backToHistory() {
+                elements.sessionDetailCard.style.display = 'none';
+                elements.sessionsTableBody.closest('#sessions-list').style.display = 'block';
+            },
+            
+            // 继续未结束的会话：将历史消息加载到面试界面并恢复会话状态
+            async continueSession(sessionId) {
+                try {
+                    // 获取会话元信息（确保存在）
+                    const session = state.sessions.find(s => s.session_id === sessionId) || (await api.getSessions()).find(s => s.session_id === sessionId);
+                    if (!session) {
+                        utils.showNotification('会话不存在，无法继续', 'error');
+                        return;
+                    }
+
+                    // 切换到面试页
+                    if (typeof navigation !== 'undefined') navigation.switchToPage('interview');
+
+                    // 更新当前会话状态
+                    this.currentSession = session;
+                    state.currentSession = session;
+                    this.isInterviewActive = true;
+
+                    // 显示聊天区
+                    elements.interviewSetup.style.display = 'none';
+                    elements.interviewChat.style.display = 'block';
+                    elements.analysisReport.style.display = 'none';
+
+                    // 加载对话消息到面试聊天区（清空旧内容）
+                    elements.chatMessages.innerHTML = '';
+                    const messages = await api.getSessionMessages(sessionId);
+                    if (messages && messages.length > 0) {
+                        messages.forEach(msg => {
+                            // 使用后端 timestamp 字段作为消息时间（兼容 created_at / createdAt）
+                            const ts = msg.timestamp || msg.created_at || msg.createdAt || null;
+                            this.addMessage(msg.role === 'human' ? 'human' : 'ai', msg.content || msg.text || '', ts);
+                        });
+                    }
+
+                    // 关闭详情并聚焦输入框
+                    this.backToHistory();
+                    elements.messageInput.focus();
+                    utils.showNotification('已恢复会话，可继续对话', 'success');
+                } catch (e) {
+                    utils.showNotification('继续会话失败: ' + (e.message || e), 'error');
+                }
+            },
+            
+            // 处理详情页的按钮动作：未结束 -> 继续面试，已结束 -> 重新生成报告
+            handleSessionDetailAction() {
+                const sessionId = elements.sessionDetailCard.dataset.sessionId;
+                if (!sessionId) {
+                    utils.showNotification('会话ID不存在', 'error');
+                    return;
+                }
+                const session = state.sessions.find(s => s.session_id === sessionId);
+                const isEnded = !!(session && session.is_ended);
+                if (!isEnded) {
+                    this.continueSession(sessionId);
+                } else {
+                    this.generateAnalysisReport(sessionId);
+                }
+            },
+            
+            //  重新生成/加载报告（兼容直接传入 sessionId）
+            async regenerateReport(sessionId) {
+                return this.generateAnalysisReport(sessionId);
+            }
+        };
+ 
+        // 页面导航
+        const navigation = {
+            // 切换到指定页面
+            switchToPage(pageId) {
+                // 隐藏所有页面
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // 移除所有导航链接的active类
+                elements.navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                // 显示目标页面
+                const targetPage = document.getElementById(pageId + '-page');
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
+                
+                // 激活对应的导航链接
+                const targetLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
+                if (targetLink) {
+                    targetLink.classList.add('active');
+                }
+
+               // 页面切换钩子：打开历史记录页时每次重新请求最新会话数据
+               try {
+                   if (pageId === 'history' && typeof sessionManager !== 'undefined' && sessionManager.loadSessions) {
+                        sessionManager.loadSessions().catch(err => console.error('加载历史记录失败:', err));
+                   }
+                    // 打开岗位页时也可刷新岗位列表（保持数据同步）
+                   if (pageId === 'positions' && typeof positionManager !== 'undefined' && positionManager.loadPositions) {
+                       positionManager.loadPositions().catch(err => console.error('加载岗位失败:', err));
+                   }
+               } catch (e) {
+                   console.error('页面切换钩子异常:', e);
+               }
+            },
+            
+            // 初始化导航
+            initNavigation() {
+                // 导航链接点击事件
+                elements.navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = link.getAttribute('data-page');
+                        this.switchToPage(page);
+                    });
+                });
+                
+                // 仪表盘中的快速导航按钮
+                document.querySelectorAll('[data-page]').forEach(button => {
+                    if (button.classList.contains('nav-link')) return;
+                    
+                    button.addEventListener('click', () => {
+                        const page = button.getAttribute('data-page');
+                                               this.switchToPage(page);
+                    });
+                });
+
+            }
+        };
+
+        // 初始化应用
+        const initApp = async () => {
+            // 初始化导航
+            navigation.initNavigation();
+
+            // 等待认证初始化（返回 true/false）
+            const loggedIn = await authManager.initAuth();
+
+            // 认证标签切换
+            elements.authTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 移除所有active类
+                    elements.authTabs.forEach(t => t.classList.remove('active'));
+                    elements.authForms.forEach(form => form.classList.remove('active'));
+                    
+                    // 激活当前标签
+                    tab.classList.add('active');
+                    
+                    // 显示对应表单
+                    const formId = tab.getAttribute('data-form') + '-form';
+                    document.getElementById(formId).classList.add('active');
+                });
+            });
+
+            // 登录按钮事件
+            elements.loginBtn.addEventListener('click', () => {
+                authManager.handleLogin();
+            });
+            
+            // 注册按钮事件
+            elements.registerBtn.addEventListener('click', () => {
+                authManager.handleRegister();
+            });
+            
+            // 点击头像跳转到登录页面（同时切换到登录标签）
+            elements.userAvatar.addEventListener('click', () => {
+                navigation.switchToPage('auth');
+                const loginTab = document.querySelector('.auth-tab[data-form="login"]');
+                if (loginTab) loginTab.click();
+            });
+            
+            // 退出按钮事件
+            elements.logoutBtn.addEventListener('click', () => {
+                authManager.handleLogout();
+            });
+            
+            // 岗位管理事件
+            elements.createPositionBtn.addEventListener('click', () => {
+                positionManager.showCreateForm();
+            });
+            
+            elements.savePositionBtn.addEventListener('click', () => {
+                positionManager.createPosition();
+            });
+            
+            elements.cancelPositionBtn.addEventListener('click', () => {
+                positionManager.hideCreateForm();
+            });
+            
+            // 岗位详情返回按钮
+            elements.positionDetailBackBtn.addEventListener('click', () => {
+                positionManager.backToList();
+            });
+            elements.positionDetailDeleteBtn.addEventListener('click', () => {
+                const id = elements.positionDetailCard.dataset.positionId;
+                if (id) positionManager.deletePosition(id);
+            });
+            
+            // 历史详情返回/重生成绑定
+            elements.sessionDetailBackBtn.addEventListener('click', () => {
+                sessionManager.backToHistory();
+            });
+            // 详情页动作按钮（继续面试 / 重新生成报告）统一由 sessionManager.handleSessionDetailAction 处理
+            elements.sessionDetailRegenerateBtn.addEventListener('click', () => {
+                sessionManager.handleSessionDetailAction();
+            });
+            
+            // 面试事件
+            elements.startInterviewBtn.addEventListener('click', () => {
+                sessionManager.startInterview();
+            });
+            
+            elements.sendMessageBtn.addEventListener('click', () => {
+                sessionManager.sendMessage();
+            });
+
+            // 自动扩展输入框高度，并支持 Shift+Enter 换行，Enter 发送
+            const autosizeInput = (el) => {
+                if (!el) return;
+                // 确保 box-sizing 为 border-box，便于计算
+                el.style.boxSizing = 'border-box';
+                // 最小高度（单行），从 dataset 读取或使用 28px
+                const minH = parseInt(el.dataset.initialHeight || '28', 10);
+                el.style.height = 'auto';
+                const newH = Math.max(el.scrollHeight, minH);
+                el.style.height = newH + 'px';
+            };
+
+            if (elements.messageInput) {
+                    // 动态计算初始单行高度并保存到 dataset，避免固定像素在不同字体/缩放下不准确
+                    const computeInitialHeight = (el) => {
+                        try {
+                            const prev = el.value;
+                            // 临时写入单字符以获得单行 scrollHeight
+                            el.value = 'A';
+                            el.style.height = 'auto';
+                            const singleLineH = el.scrollHeight || 28;
+                            el.value = prev;
+                            // 将初始高度设为单行高度的三倍（满足用户要求）
+                            return Math.max(28, Math.ceil(singleLineH * 3));
+                        } catch (e) {
+                            return 28 * 3;
+                        }
+                    };
+
+                    const initialH = computeInitialHeight(elements.messageInput);
+                    elements.messageInput.dataset.initialHeight = String(initialH);
+                    elements.messageInput.style.height = initialH + 'px';
+                    elements.messageInput.style.overflow = 'hidden';
+
+                // 绑定事件
+                elements.messageInput.addEventListener('input', () => autosizeInput(elements.messageInput));
+                // 初始计算（若页面已填充内容）
+                autosizeInput(elements.messageInput);
+
+                elements.messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sessionManager.sendMessage();
+                    }
+                });
+            }
+            
+            elements.endInterviewBtn.addEventListener('click', () => {
+                sessionManager.endInterview();
+            });
+            // 结束面试（删除会话并返回）
+            if (elements.finishInterviewBtn) {
+                elements.finishInterviewBtn.addEventListener('click', async () => {
+                    try {
+                        await sessionManager.finishInterview();
+                    } catch (e) {
+                        utils.showNotification('结束面试失败: ' + (e.message || e), 'error');
+                    }
+                });
+            }
+            
+            elements.analyzeInterviewBtn.addEventListener('click', () => {
+                sessionManager.generateAnalysisReport();
+            });
+            
+            // 根据认证状态显示页面：未登录显示 auth-page，已登录显示 dashboard
+            if (loggedIn) {
+                navigation.switchToPage('dashboard');
+            } else {
+                navigation.switchToPage('auth');
+            }
+        };
+         
+        // 全局导出（用于HTML中的onclick调用）
+         window.positionManager = positionManager;
+         window.sessionManager = sessionManager;
+ 
+        // 当DOM加载完成后初始化应用
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

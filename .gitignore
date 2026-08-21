@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 环境变量（含密钥，严禁提交）
+.env
+.env.*
+!.env.example
+
+# IDE / 本地配置
+.vscode/
+.idea/
+
+# 运行时数据（含用户/会话/token，仅本地调试）
+后端/data.json
+data.json
+
+# 系统文件
+.DS_Store
+Thumbs.db
